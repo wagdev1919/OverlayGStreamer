@@ -1,0 +1,29 @@
+GStream Data
+
+###RTMP Streaming
+gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=3280, height=1848, framerate=28/1, format=NV12'  ! nvvidconv left=200 right=3080 top=600 bottom=1200 !  'video/x-raw,width=2880, height=600, framerate=28/1, format=NV12, pixel-aspect-ratio=1/1' ! nvvidconv ! nvv4l2h264enc ! h264parse ! flvmux ! rtmpsink location='rtmp://x.x.x.x:1935/live/test '
+
+
+###GStream Capture show video window C++
+https://github.com/JetsonHacksNano/CSI-Camera
+
+###GStreamer Daemon - MP4 Video Recording
+https://developer.ridgerun.com/wiki/index.php?title=GStreamer_Daemon_-_MP4_Video_Recording
+
+###GStream RTMP Stream (Hardware accellerate, plugin needed)
+gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=3280, height=1848, framerate=28/1, format=NV12'  !  nvv4l2h264enc ! h264parse ! flvmux ! rtmpsink location='rtmp://x.x.x.x:1935/live/test '
+
+###GStream Receiving video from RTSP live stream
+#Server(nvcamerasrc=>nvarguscamerasrc)
+$ ./test-launch "nvcamerasrc ! video/x-raw(memory:NVMM),width=640,height=480 ! tee name=t t. ! queue ! nvoverlaysink overlay-x=50 overlay-y=50 overlay-w=640 overlay-h=480 t. ! queue ! omxh264enc ! video/x-h264,profile=baseline ! rtph264pay name=pay0 pt=96"
+
+#Client
+$ export RTSP_PATH=rtsp://127.0.0.1:8554/test
+$ gst-launch-1.0 rtspsrc location="$RTSP_PATH" latency=500 ! rtph264depay ! h264parse ! omxh264dec ! nvoverlaysink overlay-x=800 overlay-y=50 overlay-w=640 overlay-h=480 overlay=2
+
+###GStream Image Overlay
+https://gist.github.com/waveform80/3390484
+http://oz9aec.net/software/gstreamer/more-gstreamer-tips-picture-in-picture-compositing
+
+###
+https://www.jetsonhacks.com/2014/10/28/gstreamer-network-video-stream-save-file/

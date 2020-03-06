@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project(mystreamer)
+#set(CMAKE_GXX_FLAGS "-lreadline")
+set(CMAKE_SYSTEM_PROCESSOR arm)
+add_executable(${PROJECT_NAME} "main.cpp")
+#target_link_libraries(${PROJECT_NAME} readline)

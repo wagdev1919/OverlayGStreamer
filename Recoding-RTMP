@@ -1,0 +1,28 @@
+gst-launch-1.0 -v -e \
+mp4mux name=fmux ! filesink location=/home/yosimura/Desktop/gtest1.mp4 sync=false \
+flvmux streamable=true name=smux ! rtmpsink sync=false location='rtmp://127.0.0.1/live/test live=1' \
+v4l2src device=/dev/video0 \
+! image/jpeg,width=640,height=480,framerate=30/1 \
+! queue ! jpegdec ! x264enc \
+! tee name=tsplit \
+! queue ! fmux.video_0 tsplit. \
+! queue ! smux. \
+pulsesrc device=alsa_input.usb-046d_HD_Pro_Webcam_C920_35B755BF-02.analog-stereo do-timestamp=true \
+! audio/x-raw,rate=32000,format=S16LE,channels=2 ! queue ! audioresample ! "audio/x-raw,rate=44100" ! queue ! audioconvert ! voaacenc bitrate=96000 \
+! tee name=asplit \
+! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! fmux.audio_0 asplit. \
+! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! aacparse ! smux.
+
+
+###Stream Only
+gst-launch-1.0 -v -e \
+flvmux streamable=true name=smux ! rtmpsink sync=false location='rtmp://127.0.0.1/live/test live=1' \
+v4l2src device=/dev/video0 \
+! image/jpeg,width=640,height=480,framerate=30/1 \
+! queue ! jpegdec ! x264enc ! queue ! smux. \
+pulsesrc device=alsa_input.usb-046d_HD_Pro_Webcam_C920_35B755BF-02.analog-stereo do-timestamp=true \
+! audio/x-raw,rate=32000,format=S16LE,channels=2 ! queue ! audioresample ! "audio/x-raw,rate=44100" ! queue ! audioconvert ! voaacenc bitrate=96000 \
+! queue max-size-buffers=0 max-size-bytes=0 max-size-time=0 ! aacparse ! smux.
+
+
+rtmp://a.rtmp.youtube.com/live2/4759-h2dr-qg53-ad4w
